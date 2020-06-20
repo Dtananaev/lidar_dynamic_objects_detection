@@ -92,6 +92,7 @@ def preprocess_data(dataset_dir):
             orientation_3d = np.asarray(
                 [transform_lidar_box_3d(box, Rt) for box in orientation_3d]
             )
+            # filter boxes containing less then 20 lidar points inside
             labels, corners_3d, orientation_3d = filter_boxes(
                 labels, corners_3d, orientation_3d, lidar
             )

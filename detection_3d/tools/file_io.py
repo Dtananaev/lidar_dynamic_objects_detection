@@ -16,7 +16,7 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-
+import os
 import json
 import numpy as np
 
@@ -40,6 +40,17 @@ def save_bboxes_to_file(filename, centroid, width, length, height, alpha, label)
                 the_file.write(data)
 
 
+def load_bboxes(label_filename):
+    # returns the array with [num_boxes, (bbox_parm)]
+    # bbox_param = [label_id, truncation(0,1), visibility (0,4),
+    # object observation angle (-pi..pi), xmin, ymin, xmax, ymax, h,w,l, x,y,z, ry (yaw)]
+    bboxes = np.asarray([line.rstrip().split(" ") for line in open(label_filename)])
+    # Convert labels to numbers
+    bboxes[:, 0] = [labels[label] for label in bboxes[:, 0]]
+    bboxes = np.asarray(bboxes, dtype=float)
+    return bboxes
+
+
 def load_lidar(lidar_filename, dtype=np.float32, n_vec=4):
     scan = np.fromfile(lidar_filename, dtype=dtype)
     scan = scan.reshape((-1, n_vec))
@@ -49,3 +60,38 @@ def load_lidar(lidar_filename, dtype=np.float32, n_vec=4):
 def save_lidar(lidar_filename, scan):
     scan = scan.reshape((-1))
     scan.tofile(lidar_filename)
+
+
+def save_to_json(json_filename, dict_to_save):
+    """
+    Save to json file
+    """
+    with open(json_filename, "w") as f:
+        json.dump(dict_to_save, f, indent=2)
+
+
+def save_dataset_list(dataset_file, data_list):
+    """
+    Saves dataset list to file.
+    """
+    with open(dataset_file, "w") as f:
+        for item in data_list:
+            f.write("%s\n" % item)
+
+
+def load_dataset_list(dataset_dir, dataset_file, delimiter=";"):
+    """
+    The function loads list of data from dataset
+    file.
+    Args:
+     dataset_file: path to the .dataset file.
+    Returns:
+     dataset_list: list of data.
+    """
+
+    file_path = os.path.join(dataset_dir, dataset_file)
+    dataset_list = []
+    with open(file_path) as f:
+        dataset_list = f.readlines()
+    dataset_list = [x.strip().split(delimiter) for x in dataset_list]
+    return dataset_list

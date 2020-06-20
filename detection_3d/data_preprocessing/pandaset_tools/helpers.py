@@ -19,6 +19,35 @@ DEALINGS IN THE SOFTWARE.
 import numpy as np
 from detection_3d.data_preprocessing.pandaset_tools.transform import rot_z
 
+labels = {
+    "Cones": 0,
+    "Towed Object": 1,
+    "Semi-truck": 2,
+    "Train": 3,
+    "Temporary Construction Barriers": 4,
+    "Rolling Containers": 5,
+    "Animals - Other": 6,
+    "Pylons": 7,
+    "Emergency Vehicle": 8,
+    "Motorcycle": 9,
+    "Construction Signs": 10,
+    "Medium-sized Truck": 11,
+    "Other Vehicle - Uncommon": 12,
+    "Tram / Subway": 13,
+    "Road Barriers": 14,
+    "Bus": 15,
+    "Pedestrian with Object": 16,
+    "Personal Mobility Device": 17,
+    "Signs": 18,
+    "Other Vehicle - Pedicab": 19,
+    "Pedestrian": 20,
+    "Car": 21,
+    "Other Vehicle - Construction Vehicle": 22,
+    "Bicycle": 23,
+    "Motorized Scooter": 24,
+    "Pickup Truck": 25,
+}
+
 
 def make_xzyhwly(bboxes):
     """

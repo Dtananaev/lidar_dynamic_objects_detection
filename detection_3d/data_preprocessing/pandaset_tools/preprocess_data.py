@@ -46,6 +46,7 @@ def preprocess_data(dataset_dir):
     """
 
     # Get list of data samples
+    all_labels = set()
     search_string = os.path.join(dataset_dir, "*")
     seq_list = sorted(glob.glob(search_string))
     for seq in tqdm(seq_list, desc="Process sequences", total=len(seq_list)):
@@ -107,6 +108,9 @@ def preprocess_data(dataset_dir):
             save_bboxes_to_file(
                 box_filename, centroid, width, length, height, yaw, labels
             )
+            for label in labels:
+                all_labels.add(label)
+        print(f"seq {seq} all_labels {all_labels}")
 
 
 if __name__ == "__main__":

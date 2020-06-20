@@ -19,6 +19,7 @@ DEALINGS IN THE SOFTWARE.
 import os
 import json
 import numpy as np
+from detection_3d.data_preprocessing.pandaset_tools.helpers import labels
 
 
 def read_json(json_filename):
@@ -34,7 +35,7 @@ def save_bboxes_to_file(filename, centroid, width, length, height, alpha, label)
             for c, w, l, h, a, lbl in zip(
                 centroid, width, length, height, alpha, label
             ):
-                data = "{} {} {} {} {} {} {} {}\n".format(
+                data = "{};{};{};{};{};{};{};{}\n".format(
                     c[0], c[1], c[2], w, l, h, a, lbl
                 )
                 the_file.write(data)
@@ -42,13 +43,12 @@ def save_bboxes_to_file(filename, centroid, width, length, height, alpha, label)
 
 def load_bboxes(label_filename):
     # returns the array with [num_boxes, (bbox_parm)]
-    # bbox_param = [label_id, truncation(0,1), visibility (0,4),
-    # object observation angle (-pi..pi), xmin, ymin, xmax, ymax, h,w,l, x,y,z, ry (yaw)]
-    bboxes = np.asarray([line.rstrip().split(" ") for line in open(label_filename)])
-    # Convert labels to numbers
-    bboxes[:, 0] = [labels[label] for label in bboxes[:, 0]]
-    bboxes = np.asarray(bboxes, dtype=float)
-    return bboxes
+    with open(label_filename) as f:
+        bboxes = np.asarray([line.rstrip().split(";") for line in f])
+        # Convert labels to numbers
+        bboxes[:, -1] = [labels[label] for label in bboxes[:, -1]]
+        bboxes = np.asarray(bboxes, dtype=float)
+        return bboxes
 
 
 def load_lidar(lidar_filename, dtype=np.float32, n_vec=4):

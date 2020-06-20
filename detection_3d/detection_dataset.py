@@ -19,8 +19,9 @@ DEALINGS IN THE SOFTWARE.
 import tensorflow as tf
 import numpy as np
 import argparse
+from tqdm import tqdm
 from detection_3d.parameters import Parameters
-from detection_3d.tools.file_io import load_dataset_list, load_lidar
+from detection_3d.tools.file_io import load_dataset_list, load_lidar, load_bboxes
 
 
 class DetectionDataset:
@@ -103,7 +104,7 @@ if __name__ == "__main__":
         "--dataset_file",
         type=str,
         help="creates .dataset file",
-        default="train.dataset",
+        default="train.datatxt",
     )
     args = parser.parse_args()
 
@@ -114,7 +115,5 @@ if __name__ == "__main__":
     lidar_coord = np.array(param_settings["lidar_offset"], dtype=np.float32)
 
     for samples in tqdm(train_dataset.dataset, total=train_dataset.num_it_per_epoch):
-        image, top_image, box_grid, intrinsics, extrinsics = samples
-        print(
-            f"image {image.shape}, top_image {top_image.shape}, box_grid {box_grid.shape}, intrinsics {intrinsics.shape}, extrinsics {extrinsics.shape}"
-        )
+        lidar, boxes = samples
+        print(f"lidar {lidar.shape}, boxes {boxes.shape}")

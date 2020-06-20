@@ -48,7 +48,7 @@ class Parameters(object):
         self.settings["scheduler"] = "no_scheduler"
 
         # Detection related
-        self.settings["grid_meters"] = [100.0, 50.0, 5.0]  # [x,y,z ] in meters
+        self.settings["grid_meters"] = [100.0, 50.0, 3.0]  # [x,y,z ] in meters
         # [x,y,z, intensity] offset to shift all lidar points in positive coordinate quadrant
         # (all x,y,z coords >=0)
         self.settings["lidar_offset"] = [-2.0, 20.0, 2.0, 0.0]

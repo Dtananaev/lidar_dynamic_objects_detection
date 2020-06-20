@@ -29,7 +29,7 @@ from detection_3d.data_preprocessing.pandaset_tools.helpers import (
 )
 import mayavi.mlab as mlab
 from tqdm import tqdm
-from detection_3d.tools.file_io import read_json
+from detection_3d.tools.file_io import read_json, save_bboxes_to_file, save_lidar
 from detection_3d.data_preprocessing.pandaset_tools.transform import (
     quaternion_to_euler,
     to_transform_matrix,
@@ -49,11 +49,17 @@ def preprocess_data(dataset_dir):
     search_string = os.path.join(dataset_dir, "*")
     seq_list = sorted(glob.glob(search_string))
     for seq in tqdm(seq_list, desc="Process sequences", total=len(seq_list)):
+        # Make output dirs for data
+        lidar_out_dir = os.path.join(seq, "lidar_processed")
+        bbox_out_dir = os.path.join(seq, "bbox_processed")
+        os.makedirs(lidar_out_dir, exist_ok=True)
+        os.makedirs(bbox_out_dir, exist_ok=True)
         search_string = os.path.join(seq, "lidar", "*.pkl.gz")
         lidar_list = sorted(glob.glob(search_string))
         lidar_pose_path = os.path.join(seq, "lidar", "poses.json")
         lidar_pose = read_json(lidar_pose_path)
         for idx, lidar_path in enumerate(lidar_list):
+            sample_idx = os.path.splitext(os.path.basename(lidar_path))[0].split(".")[0]
             # Get pose of the lidar
             translation = lidar_pose[idx]["position"]
             translation = np.asarray([translation[key] for key in translation])
@@ -93,24 +99,13 @@ def preprocess_data(dataset_dir):
                 corners_3d
             )
 
-            boxes_new = np.concatenate(
-                (
-                    centroid,
-                    length[:, None],
-                    width[:, None],
-                    height[:, None],
-                    yaw[:, None],
-                ),
-                axis=-1,
+            # Save lidar
+            lidar_filename = os.path.join(lidar_out_dir, sample_idx + ".bin")
+            save_lidar(lidar_filename, lidar.astype(np.float32))
+            box_filename = os.path.join(bbox_out_dir, sample_idx + ".txt")
+            save_bboxes_to_file(
+                box_filename, centroid, width, length, height, yaw, labels
             )
-
-            corners_3d, orientation_3d = make_eight_points_boxes(boxes_new)
-
-            figure = visualize_bboxes_3d(corners_3d, None, orientation_3d)
-            figure = visualize_lidar(lidar, figure)
-            mlab.show(1)
-            input()
-            mlab.close(figure)
 
 
 if __name__ == "__main__":

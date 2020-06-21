@@ -35,12 +35,12 @@ class Parameters(object):
             "train_summaries": "log/summaries/train",
             "eval_summaries": "log/summaries/val",
             # Update tensorboard train images each step_summaries iterations
-            "step_summaries": 500,  # to turn off make it None
+            "step_summaries": 100,  # to turn off make it None
             # General settings
             "seed": 2020,
             "max_epochs": 1000,
             "weight_decay": 1e-4,
-            "learning_rate": 1e-4,
+            "learning_rate": 1e-5,
         }
 
         # Set special parameters
@@ -48,12 +48,12 @@ class Parameters(object):
         self.settings["scheduler"] = "no_scheduler"
 
         # Detection related
-        self.settings["grid_meters"] = [52.0, 104.0, 3.0]  # [x,y,z ] in meters
+        self.settings["grid_meters"] = [52.0, 104.0, 8.0]  # [x,y,z ] in meters
         # [x,y,z, intensity] offset to shift all lidar points in positive coordinate quadrant
         # (all x,y,z coords >=0)
         self.settings["lidar_offset"] = [26.0, 52.0, 2.5, 0.0]
         # [x,y,z] voxel size in meters
-        self.settings["voxel_size"] = [0.125, 0.125, 1.0]
+        self.settings["voxel_size"] = [0.125, 0.125, 8.0]
         # [x,y,z] voxel size in meters
         self.settings["bbox_voxel_size"] = [0.25, 0.25, 1.0]
 

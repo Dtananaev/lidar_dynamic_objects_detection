@@ -78,8 +78,8 @@ class DetectionDataset:
 
         lidar = load_lidar(lidar_file)
         bboxes = load_bboxes(bboxes_file)
-        labels = bboxes[:, 0]
-        lidar_corners_3d, _ = make_eight_points_boxes(bboxes[:, 1:])
+        labels = bboxes[:, -1]
+        lidar_corners_3d, _ = make_eight_points_boxes(bboxes[:, :-1])
         # # Shift lidar coordinate to positive quadrant
         lidar_coord = np.asarray(self.param_settings["lidar_offset"], dtype=np.float32)
         lidar = lidar + lidar_coord

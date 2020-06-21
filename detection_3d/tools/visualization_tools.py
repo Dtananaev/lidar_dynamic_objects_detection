@@ -129,7 +129,6 @@ def visualize_bboxes_3d(lidar_corners_3d, figure=None, orientation=None):
 def draw_boxes_top_view(
     top_view_image, boxes_3d, grid_meters, labels, orientation_3d=None
 ):
-    print(f"boxes_3d {boxes_3d.shape}")
     height, width, channels = top_view_image.shape
     delimiter_x = grid_meters[0] / height
     delimiter_y = grid_meters[1] / width
@@ -168,7 +167,6 @@ def visualize_2d_boxes_on_top_image(
 
         box, labels, _ = get_boxes_from_box_grid(boxes, bbox_voxel_size)
         box = box.numpy()
-        print(f"box {box.shape}")
         box, orientation_3d = make_eight_points_boxes(box)
 
         if prediction:

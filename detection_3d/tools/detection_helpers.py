@@ -47,7 +47,7 @@ def make_eight_points_boxes(bboxes_xyzlwhy):
 
     centroid = bboxes_xyzlwhy[:, :3]
     corners_3d += centroid[:, :, None]
-    orient_p = (corners_3d[:, :, 0] + corners_3d[:, :, 5]) / 2.0
+    orient_p = (corners_3d[:, :, 0] + corners_3d[:, :, 7]) / 2.0
     orientation_3d = np.concatenate(
         (centroid[:, :, None], orient_p[:, :, None]), axis=-1
     )
@@ -151,7 +151,6 @@ def get_bboxes_grid(bbox_labels, lidar_corners_3d, grid_meters, bbox_voxel_size)
 
 
 def get_boxes_from_box_grid(box_grid, bbox_voxel_size, conf_trhld=0.9):
-    print(f"box_grid {box_grid.shape}")
 
     # Get non-zero voxels
     objectness, delta_xy, orient_xy, z_coord, width, height, label = tf.split(
@@ -177,7 +176,6 @@ def get_boxes_from_box_grid(box_grid, bbox_voxel_size, conf_trhld=0.9):
     yaw = tf.expand_dims(tf.atan2(delta[:, 1], delta[:, 0]), axis=-1)
 
     bbox = tf.concat([xy_coord, z_coord, length, width, height, yaw], axis=-1,)
-    print(f"box shape {bbox.shape}")
     return bbox, label, objectness
 
 
@@ -202,4 +200,3 @@ def make_top_view_image(lidar, grid_meters, voxels_size, channels=3):
     top_view[voxels[:, 0], voxels[:, 1], 1] = lidar[:, 3]  # intensity values
 
     return top_view
-

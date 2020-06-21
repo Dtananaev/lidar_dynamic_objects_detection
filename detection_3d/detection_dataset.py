@@ -22,6 +22,11 @@ import argparse
 from tqdm import tqdm
 from detection_3d.parameters import Parameters
 from detection_3d.tools.file_io import load_dataset_list, load_lidar, load_bboxes
+from detection_3d.tools.detection_helpers import (
+    make_top_view_image,
+    make_eight_points_boxes,
+    get_bboxes_grid,
+)
 
 
 class DetectionDataset:
@@ -71,31 +76,23 @@ class DetectionDataset:
 
         lidar = load_lidar(lidar_file)
         bboxes = load_bboxes(bboxes_file)
-
-        # calib = load_calibration(calib_file)
-        # intrinsics, cam_T_lidar, lidar_T_cam = get_calib_matricies(calib)
-        # lidar_corners_3d = np.asarray(
-        #     [np.transpose(compute_lidar_box_3d(bbox, lidar_T_cam)) for bbox in bboxes]
-        # )
-        # labels = bboxes[:, 0]
-        # if self.augmentation:
-        #     img, lidar, lidar_corners_3d = self.run_augmentation(
-        #         img, lidar, lidar_corners_3d
-        #     )
+        labels = bboxes[:, 0]
+        lidar_corners_3d, _ = make_eight_points_boxes(bboxes[:, 1:])
         # # Shift lidar coordinate to positive quadrant
-        # lidar_coord = np.asarray(self.param_settings["lidar_offset"], dtype=np.float32)
-        # lidar = lidar + lidar_coord
-        # lidar_corners_3d = lidar_corners_3d + lidar_coord[:3]
-        # top_view = make_top_view_image(
-        #     lidar, self.param_settings["grid_meters"], self.param_settings["voxel_size"]
-        # )
-        # box_grid = get_bboxes_grid(
-        #     labels,
-        #     lidar_corners_3d,
-        #     self.param_settings["grid_meters"],
-        #     self.param_settings["bbox_voxel_size"],
-        # )
-        return lidar, bboxes
+        lidar_coord = np.asarray(self.param_settings["lidar_offset"], dtype=np.float32)
+        lidar = lidar + lidar_coord
+        lidar_corners_3d = lidar_corners_3d + lidar_coord[:3]
+        # Process data
+        top_view = make_top_view_image(
+            lidar, self.param_settings["grid_meters"], self.param_settings["voxel_size"]
+        )
+        box_grid = get_bboxes_grid(
+            labels,
+            lidar_corners_3d,
+            self.param_settings["grid_meters"],
+            self.param_settings["bbox_voxel_size"],
+        )
+        return top_view, box_grid
 
 
 if __name__ == "__main__":

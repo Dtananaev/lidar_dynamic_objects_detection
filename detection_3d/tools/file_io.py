@@ -36,7 +36,7 @@ def save_bboxes_to_file(filename, centroid, width, length, height, alpha, label)
                 centroid, width, length, height, alpha, label
             ):
                 data = "{};{};{};{};{};{};{};{}\n".format(
-                    c[0], c[1], c[2], w, l, h, a, lbl
+                    c[0], c[1], c[2], l, w, h, a, lbl
                 )
                 the_file.write(data)
 

@@ -23,8 +23,10 @@ import glob
 import pandas as pd
 from detection_3d.data_preprocessing.pandaset_tools.helpers import (
     make_xzyhwly,
-    make_eight_points_boxes,
     filter_boxes,
+)
+from detection_3d.tools.detection_helpers import (
+    make_eight_points_boxes,
     get_bboxes_parameters_from_points,
 )
 import mayavi.mlab as mlab
@@ -44,7 +46,7 @@ def preprocess_data(dataset_dir):
     Arguments:
         dataset_dir: directory with  Pandaset data
     """
-
+    shift_lidar = [25, 50, 2.5]
     # Get list of data samples
     search_string = os.path.join(dataset_dir, "*")
     seq_list = sorted(glob.glob(search_string))
@@ -103,9 +105,11 @@ def preprocess_data(dataset_dir):
                 ),
                 axis=-1,
             )
+            lidar[:, :3] = lidar[:, :3] + shift_lidar
 
             corners_3d, orientation_3d = make_eight_points_boxes(boxes_new)
-
+            corners_3d = corners_3d + shift_lidar
+            orientation_3d = orientation_3d + shift_lidar
             figure = visualize_bboxes_3d(corners_3d, None, orientation_3d)
             figure = visualize_lidar(lidar, figure)
             mlab.show(1)

@@ -29,7 +29,7 @@ class Parameters(object):
         self.settings = {
             # The directory for checkpoints
             "dataset_dir": "dataset",
-            "batch_size": 4,
+            "batch_size": 1,
             # The checkpoint related
             "checkpoints_dir": "log/checkpoints",
             "train_summaries": "log/summaries/train",
@@ -48,10 +48,10 @@ class Parameters(object):
         self.settings["scheduler"] = "no_scheduler"
 
         # Detection related
-        self.settings["grid_meters"] = [100.0, 50.0, 3.0]  # [x,y,z ] in meters
+        self.settings["grid_meters"] = [50.0, 100.0, 3.0]  # [x,y,z ] in meters
         # [x,y,z, intensity] offset to shift all lidar points in positive coordinate quadrant
         # (all x,y,z coords >=0)
-        self.settings["lidar_offset"] = [-2.0, 20.0, 2.0, 0.0]
+        self.settings["lidar_offset"] = [25.0, 50.0, 2.5, 0.0]
         # [x,y,z] voxel size in meters
         self.settings["voxel_size"] = [0.125, 0.125, 1.0]
         # [x,y,z] voxel size in meters

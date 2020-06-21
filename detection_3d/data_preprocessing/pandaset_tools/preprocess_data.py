@@ -23,8 +23,10 @@ import glob
 import pandas as pd
 from detection_3d.data_preprocessing.pandaset_tools.helpers import (
     make_xzyhwly,
-    make_eight_points_boxes,
     filter_boxes,
+)
+from detection_3d.tools.detection_helpers import (
+    make_eight_points_boxes,
     get_bboxes_parameters_from_points,
 )
 import mayavi.mlab as mlab
@@ -108,9 +110,6 @@ def preprocess_data(dataset_dir):
             save_bboxes_to_file(
                 box_filename, centroid, width, length, height, yaw, labels
             )
-            for label in labels:
-                all_labels.add(label)
-        print(f"seq {seq} all_labels {all_labels}")
 
 
 if __name__ == "__main__":

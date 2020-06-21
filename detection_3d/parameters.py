@@ -29,13 +29,13 @@ class Parameters(object):
         self.settings = {
             # The directory for checkpoints
             "dataset_dir": "dataset",
-            "batch_size": 1,
+            "batch_size": 4,
             # The checkpoint related
             "checkpoints_dir": "log/checkpoints",
             "train_summaries": "log/summaries/train",
             "eval_summaries": "log/summaries/val",
             # Update tensorboard train images each step_summaries iterations
-            "step_summaries": None,  # to turn off make it None
+            "step_summaries": 100,  # to turn off make it None
             # General settings
             "seed": 2020,
             "max_epochs": 1000,

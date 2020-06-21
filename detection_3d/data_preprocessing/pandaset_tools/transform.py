@@ -20,15 +20,6 @@ DEALINGS IN THE SOFTWARE.
 import numpy as np
 
 
-def rot_z(t):
-    """ Rotation about the z-axis. """
-    c = np.cos(t)
-    s = np.sin(t)
-    ones = np.ones_like(c)
-    zeros = np.zeros_like(c)
-    return np.asarray([[c, -s, zeros], [s, c, zeros], [zeros, zeros, ones]])
-
-
 def quaternion_to_euler(w, x, y, z):
     """
     Converts quaternions with components w, x, y, z into a tuple (roll, pitch, yaw)

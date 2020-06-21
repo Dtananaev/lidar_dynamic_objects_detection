@@ -22,6 +22,10 @@ import cv2
 import matplotlib.pyplot as plt
 import copy
 from tqdm import tqdm
+from detection_3d.tools.detection_helpers import (
+    get_boxes_from_box_grid,
+    make_eight_points_boxes,
+)
 
 
 def visualize_lidar(lidar, figure=None):
@@ -120,3 +124,60 @@ def visualize_bboxes_3d(lidar_corners_3d, figure=None, orientation=None):
             )
     print(f"Done")
     return figure
+
+
+def draw_boxes_top_view(
+    top_view_image, boxes_3d, grid_meters, labels, orientation_3d=None
+):
+    print(f"boxes_3d {boxes_3d.shape}")
+    height, width, channels = top_view_image.shape
+    delimiter_x = grid_meters[0] / height
+    delimiter_y = grid_meters[1] / width
+    thickness = 2
+    for idx, b in enumerate(boxes_3d):
+        color = (0, 1, 0)  # get_color(labels[idx])
+        b = b[:4]
+        x = np.floor(b[:, 0] / delimiter_x).astype(int)
+
+        y = np.floor(b[:, 1] / delimiter_y).astype(int)
+
+        cv2.line(top_view_image, (y[0], x[0]), (y[1], x[1]), color, thickness)
+        cv2.line(top_view_image, (y[1], x[1]), (y[2], x[2]), color, thickness)
+        cv2.line(top_view_image, (y[2], x[2]), (y[3], x[3]), color, thickness)
+        cv2.line(top_view_image, (y[3], x[3]), (y[0], x[0]), color, thickness)
+
+    if orientation_3d is not None:
+        for o in orientation_3d:
+            x = np.floor(o[:, 0] / delimiter_x).astype(int)
+            y = np.floor(o[:, 1] / delimiter_y).astype(int)
+            cv2.arrowedLine(
+                top_view_image, (y[0], x[0]), (y[1], x[1]), (1, 0, 0), thickness
+            )
+    return top_view_image
+
+
+def visualize_2d_boxes_on_top_image(
+    bboxes_grid, top_view, grid_meters, bbox_voxel_size, prediction=False
+):
+    top_image_vis = []
+    for boxes, top_image in zip(bboxes_grid, top_view):  # iterate over batch
+        top_image = top_image.numpy()
+        shape = top_image.shape
+        rgb_image = np.zeros((shape[0], shape[1], 3))
+        rgb_image[top_image[:, :, 0] > 0] = 1
+
+        box, labels, _ = get_boxes_from_box_grid(boxes, bbox_voxel_size)
+        box = box.numpy()
+        print(f"box {box.shape}")
+        box, orientation_3d = make_eight_points_boxes(box)
+
+        if prediction:
+            labels = np.argmax(labels, axis=-1)
+        if len(box) > 0:
+            rgb_image = draw_boxes_top_view(
+                rgb_image, box, grid_meters, labels, orientation_3d
+            )
+
+        # rgb_image = np.rot90(rgb_image)
+        top_image_vis.append(rgb_image)
+    return np.asarray(top_image_vis)

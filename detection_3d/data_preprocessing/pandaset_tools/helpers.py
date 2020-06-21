@@ -17,7 +17,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 DEALINGS IN THE SOFTWARE.
 """
 import numpy as np
-from detection_3d.data_preprocessing.pandaset_tools.transform import rot_z
 
 labels = {
     "Cones": 0,

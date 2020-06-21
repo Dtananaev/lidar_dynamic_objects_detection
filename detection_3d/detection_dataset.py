@@ -27,6 +27,8 @@ from detection_3d.tools.detection_helpers import (
     make_eight_points_boxes,
     get_bboxes_grid,
 )
+from detection_3d.tools.visualization_tools import visualize_2d_boxes_on_top_image
+from PIL import Image
 
 
 class DetectionDataset:
@@ -109,8 +111,20 @@ if __name__ == "__main__":
     train_dataset = DetectionDataset(param_settings, args.dataset_file)
 
     bbox_voxel_size = np.asarray(param_settings["bbox_voxel_size"], dtype=np.float32)
+    grid_meters = np.array(param_settings["grid_meters"], dtype=np.float32)
+
     lidar_coord = np.array(param_settings["lidar_offset"], dtype=np.float32)
 
     for samples in tqdm(train_dataset.dataset, total=train_dataset.num_it_per_epoch):
-        lidar, boxes = samples
-        print(f"lidar {lidar.shape}, boxes {boxes.shape}")
+        top_images, boxes_grid = samples
+        print(f"lidar {top_images.shape}, boxes {boxes_grid.shape}")
+
+        top_view = (
+            visualize_2d_boxes_on_top_image(
+                boxes_grid, top_images, grid_meters, bbox_voxel_size
+            )
+            * 255
+        )
+        img = Image.fromarray(top_view[0].astype("uint8"))
+        img.save("result.png")
+        input()

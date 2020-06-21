@@ -17,6 +17,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 DEALINGS IN THE SOFTWARE.
 """
 import numpy as np
+import tensorflow as tf
 
 
 def rot_z(t):
@@ -29,7 +30,7 @@ def rot_z(t):
 
 
 def make_eight_points_boxes(bboxes_xyzlwhy):
-
+    bboxes_xyzlwhy = np.asarray(bboxes_xyzlwhy)
     l = bboxes_xyzlwhy[:, 3] / 2.0
     w = bboxes_xyzlwhy[:, 4] / 2.0
     h = bboxes_xyzlwhy[:, 5] / 2.0
@@ -93,7 +94,7 @@ def get_bboxes_grid(bbox_labels, lidar_corners_3d, grid_meters, bbox_voxel_size)
         lidar_corners_3d
     )
     # find the vector of orientation [centroid, orient_point]
-    orient_point = (lidar_corners_3d[:, 0] + lidar_corners_3d[:, 1]) / 2.0
+    orient_point = (lidar_corners_3d[:, 1] + lidar_corners_3d[:, 2]) / 2.0
 
     voxel_coordinates = np.asarray(
         np.floor(centroid[:, :2] / bbox_voxel_size[:2]), np.int32
@@ -134,11 +135,50 @@ def get_bboxes_grid(bbox_labels, lidar_corners_3d, grid_meters, bbox_voxel_size)
     output_tensor = np.zeros((voxels_grid[0], voxels_grid[1], 9), np.float32)
     if len(bbox_labels) > 0:
         data = np.concatenate(
-            (confidence[:, None], delta_xy, orient_xy, z_coord[:, None], width[:, None], height[:, None], bbox_labels[:, None]),
+            (
+                confidence[:, None],
+                delta_xy,
+                orient_xy,
+                z_coord[:, None],
+                width[:, None],
+                height[:, None],
+                bbox_labels[:, None],
+            ),
             axis=-1,
         )
         output_tensor[voxel_coordinates[:, 0], voxel_coordinates[:, 1]] = data
     return output_tensor
+
+
+def get_boxes_from_box_grid(box_grid, bbox_voxel_size, conf_trhld=0.9):
+    print(f"box_grid {box_grid.shape}")
+
+    # Get non-zero voxels
+    objectness, delta_xy, orient_xy, z_coord, width, height, label = tf.split(
+        box_grid, (1, 2, 2, 1, 1, 1, -1), axis=-1
+    )
+
+    mask = box_grid[:, :, 0] >= conf_trhld
+    valid_idx = tf.where(mask)
+
+    z_coord = tf.gather_nd(z_coord, valid_idx)
+    width = tf.gather_nd(width, valid_idx)
+    height = tf.gather_nd(height, valid_idx)
+    objectness = tf.gather_nd(objectness, valid_idx)
+    label = tf.gather_nd(label, valid_idx)
+    delta_xy = tf.gather_nd(delta_xy, valid_idx)
+    orient_xy = tf.gather_nd(orient_xy, valid_idx)
+    voxels_close_corners = tf.cast(valid_idx, tf.float32) * bbox_voxel_size[None, :2]
+    xy_coord = delta_xy + voxels_close_corners
+    xy_orient = orient_xy + voxels_close_corners
+
+    delta = xy_orient[:, :2] - xy_coord[:, :2]
+    length = 2 * tf.norm(delta, axis=-1, keepdims=True)
+    yaw = tf.expand_dims(tf.atan2(delta[:, 1], delta[:, 0]), axis=-1)
+
+    bbox = tf.concat([xy_coord, z_coord, length, width, height, yaw], axis=-1,)
+    print(f"box shape {bbox.shape}")
+    return bbox, label, objectness
 
 
 def make_top_view_image(lidar, grid_meters, voxels_size, channels=3):

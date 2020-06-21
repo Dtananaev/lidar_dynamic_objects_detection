@@ -48,7 +48,6 @@ def preprocess_data(dataset_dir):
     """
 
     # Get list of data samples
-    all_labels = set()
     search_string = os.path.join(dataset_dir, "*")
     seq_list = sorted(glob.glob(search_string))
     for seq in tqdm(seq_list, desc="Process sequences", total=len(seq_list)):
@@ -103,7 +102,7 @@ def preprocess_data(dataset_dir):
                 corners_3d
             )
 
-            # Save lidar
+            # Save data
             lidar_filename = os.path.join(lidar_out_dir, sample_idx + ".bin")
             save_lidar(lidar_filename, lidar.astype(np.float32))
             box_filename = os.path.join(bbox_out_dir, sample_idx + ".txt")

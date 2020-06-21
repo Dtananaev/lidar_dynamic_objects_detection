@@ -48,6 +48,41 @@ labels = {
 }
 
 
+def get_color(label):
+    # "Tram": 0, "Car": 1, "Misc": 2, "Van": 3, "Person_sitting": 4, "Pedestrian": 5, "Truck": 6, "Cyclist": 7
+    color = np.asarray(
+        [
+            [255, 229, 204],  # "Cones": 0,
+            [255, 255, 204],  # "Towed Object": 1,
+            [204, 204, 255],  # "Semi-truck": 2,
+            [255, 204, 204],  # "Train": 3,
+            [255, 204, 153],  # "Temporary Construction Barriers": 4,
+            [204, 255, 204],  # "Rolling Containers": 5,
+            [255, 204, 229],  #     "Animals - Other": 6,
+            [153, 255, 153],  #    "Pylons": 7,
+            [128, 128, 128],  #    "Emergency Vehicle": 8,
+            [255, 255, 102],  #   "Motorcycle": 9,
+            [255, 153, 51],  # "Construction Signs": 10,
+            [153, 153, 255],  # "Medium-sized Truck": 11,
+            [255, 255, 255],  #  "Other Vehicle - Uncommon": 12,
+            [255, 102, 102],  #   "Tram / Subway": 13,
+            [204, 102, 0],  #   "Road Barriers": 14,
+            [0, 0, 255],  #   "Bus": 15,
+            [255, 51, 153],  #    "Pedestrian with Object": 16,
+            [153, 153, 0],  # "Personal Mobility Device"
+            [255, 153, 51],  #   "Signs": 18,
+            [128, 128, 128],  #    "Other Vehicle - Pedicab": 19,
+            [204, 0, 102],  # Pedestrian
+            [0, 255, 0],  # Car
+            [0, 0, 102],  # "Other Vehicle - Construction Vehicle"
+            [255, 255, 0],  # "Other Vehicle - Construction Vehicle"
+            [255, 255, 153],  #    "Motorized Scooter": 24,
+            [51, 255, 255],  #    "Motorized Scooter": 24,
+        ]
+    )
+    return color[int(label)]
+
+
 def make_xzyhwly(bboxes):
     """
     Get raw data from bboxes and return xyzwlhy

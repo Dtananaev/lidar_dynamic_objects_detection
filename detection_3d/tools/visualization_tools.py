@@ -26,6 +26,7 @@ from detection_3d.tools.detection_helpers import (
     get_boxes_from_box_grid,
     make_eight_points_boxes,
 )
+from detection_3d.data_preprocessing.pandaset_tools.helpers import get_color
 
 
 def visualize_lidar(lidar, figure=None):
@@ -134,7 +135,7 @@ def draw_boxes_top_view(
     delimiter_y = grid_meters[1] / width
     thickness = 2
     for idx, b in enumerate(boxes_3d):
-        color = (0, 1, 0)  # get_color(labels[idx])
+        color = get_color(labels[idx]) / 255
         b = b[:4]
         x = np.floor(b[:, 0] / delimiter_x).astype(int)
 

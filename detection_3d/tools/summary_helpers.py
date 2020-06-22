@@ -21,7 +21,7 @@ import numpy as np
 from detection_3d.tools.visualization_tools import visualize_2d_boxes_on_top_image
 
 
-def train_summaries(train_out, optimizer, param_settings):
+def train_summaries(train_out, optimizer, param_settings, learning_rate):
     """
     Visualizes  the train outputs in tensorboards
     """
@@ -38,6 +38,16 @@ def train_summaries(train_out, optimizer, param_settings):
             height_loss,
             delta_orient_loss,
         ) = train_out["losses"]
+
+        # Show learning rate given scheduler
+        if param_settings["scheduler"] != "no_scheduler":
+            with tf.name_scope("Optimizer info"):
+                step = float(
+                    optimizer.iterations.numpy()
+                )  # triangular_scheduler learning rate needs float dtype
+                tf.summary.scalar(
+                    "learning_rate", learning_rate(step), step=optimizer.iterations
+                )
         with tf.name_scope("Training losses"):
             tf.summary.scalar(
                 "1.Total loss", train_out["total_loss"], step=optimizer.iterations
@@ -82,3 +92,26 @@ def train_summaries(train_out, optimizer, param_settings):
                 tf.summary.image(
                     "Predicted top view", p_top_view, step=optimizer.iterations
                 )
+
+
+def epoch_metrics_summaries(param_settings, epoch_metrics, epoch):
+    """
+    Visualizes epoch metrics
+    """
+    # Train results
+    writer = tf.summary.create_file_writer(param_settings["train_summaries"])
+    with writer.as_default():
+        # Show epoch metrics for train
+        with tf.name_scope("Epoch metrics"):
+            tf.summary.scalar(
+                "1. Loss", epoch_metrics.train_loss.result().numpy(), step=epoch
+            )
+
+    # Val results
+    writer = tf.summary.create_file_writer(param_settings["eval_summaries"])
+    with writer.as_default():
+        # Show epoch metrics for train
+        with tf.name_scope("Epoch metrics"):
+            tf.summary.scalar(
+                "1. Loss", epoch_metrics.val_loss.result().numpy(), step=epoch
+            )

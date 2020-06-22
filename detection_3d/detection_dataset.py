@@ -53,7 +53,7 @@ class DetectionDataset:
         self.num_it_per_epoch = int(
             self.num_samples / self.param_settings["batch_size"]
         )
-        self.output_types = [tf.float32, tf.float32]
+        self.output_types = [tf.float32, tf.float32, tf.string]
 
         ds = tf.data.Dataset.from_tensor_slices(self.inputs_list)
 
@@ -94,7 +94,7 @@ class DetectionDataset:
             self.param_settings["grid_meters"],
             self.param_settings["bbox_voxel_size"],
         )
-        return top_view, box_grid
+        return top_view, box_grid, lidar_file
 
 
 if __name__ == "__main__":
@@ -116,8 +116,10 @@ if __name__ == "__main__":
     lidar_coord = np.array(param_settings["lidar_offset"], dtype=np.float32)
 
     for samples in tqdm(train_dataset.dataset, total=train_dataset.num_it_per_epoch):
-        top_images, boxes_grid = samples
-        print(f"lidar {top_images.shape}, boxes {boxes_grid.shape}")
+        top_images, boxes_grid, lidar_file = samples
+        print(
+            f"lidar {top_images.shape}, boxes {boxes_grid.shape}, lidar_file {lidar_file}"
+        )
 
         top_view = (
             visualize_2d_boxes_on_top_image(

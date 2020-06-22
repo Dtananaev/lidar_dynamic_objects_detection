@@ -30,7 +30,8 @@ from detection_3d.tools.training_helpers import (
     get_optimizer,
 )
 from detection_3d.losses import detection_loss
-from detection_3d.tools.summary_helpers import train_summaries
+from detection_3d.tools.summary_helpers import train_summaries, epoch_metrics_summaries
+from detection_3d.metrics import EpochMetrics
 from tqdm import tqdm
 
 
@@ -38,7 +39,7 @@ from tqdm import tqdm
 def train_step(param_settings, train_samples, model, optimizer, epoch_metrics=None):
 
     with tf.GradientTape() as tape:
-        top_view, box_grid = train_samples
+        top_view, box_grid, _ = train_samples
         predictions = model(top_view, training=True)
         (
             obj_loss,
@@ -78,33 +79,33 @@ def train_step(param_settings, train_samples, model, optimizer, epoch_metrics=No
     return train_outputs
 
 
-# @tf.function
-# def val_step(samples, model, epoch_metrics=None):
+@tf.function
+def val_step(samples, model, epoch_metrics=None):
 
-#     _, top_images, bboxes, _, _ = samples
-#     predictions = model(top_images, training=False)
-#     (
-#         obj_loss,
-#         label_loss,
-#         z_loss,
-#         delta_xy_loss,
-#         width_loss,
-#         height_loss,
-#         delta_orient_loss,
-#     ) = pc_net_loss(bboxes, predictions)
-#     losses = [
-#         obj_loss,
-#         label_loss,
-#         z_loss,
-#         delta_xy_loss,
-#         width_loss,
-#         height_loss,
-#         delta_orient_loss,
-#     ]
-#     detection_loss = tf.reduce_sum(losses)
+    top_view, box_grid, _ = samples
+    predictions = model(top_view, training=False)
+    (
+        obj_loss,
+        label_loss,
+        z_loss,
+        delta_xy_loss,
+        width_loss,
+        height_loss,
+        delta_orient_loss,
+    ) = detection_loss(box_grid, predictions)
+    losses = [
+        obj_loss,
+        label_loss,
+        z_loss,
+        delta_xy_loss,
+        width_loss,
+        height_loss,
+        delta_orient_loss,
+    ]
+    total_detection_loss = tf.reduce_sum(losses)
 
-#     if epoch_metrics is not None:
-#         epoch_metrics.val_loss(detection_loss)
+    if epoch_metrics is not None:
+        epoch_metrics.val_loss(total_detection_loss)
 
 
 def train(resume=False):
@@ -131,32 +132,35 @@ def train(resume=False):
     start_epoch, model = load_model(param.settings["checkpoints_dir"], model, resume)
     model_path = os.path.join(param.settings["checkpoints_dir"], "{model}-{epoch:04d}")
 
-    optimizer = get_optimizer(
-        param.settings["optimizer"], param.settings["learning_rate"]
+    learning_rate, optimizer = get_optimizer(
+        param.settings["optimizer"],
+        param.settings["scheduler"],
+        param.settings["learning_rate"],
+        train_dataset.num_it_per_epoch,
     )
-    # epoch_metrics = EpochMetrics()
+    epoch_metrics = EpochMetrics()
 
     for epoch in range(start_epoch, param.settings["max_epochs"]):
         save_dir = model_path.format(model=model.name, epoch=epoch)
-        # epoch_metrics.reset()
+        epoch_metrics.reset()
         for train_samples in tqdm(
             train_dataset.dataset,
             desc=f"Epoch {epoch}",
             total=train_dataset.num_it_per_epoch,
         ):
             train_outputs = train_step(
-                param.settings, train_samples, model, optimizer, epoch_metrics=None
+                param.settings, train_samples, model, optimizer, epoch_metrics
             )
-            train_summaries(train_outputs, optimizer, param.settings)
-        # for val_samples in tqdm(
-        #     val_dataset.dataset, desc="Validation", total=val_dataset.num_it_per_epoch
-        # ):
-        #     val_step(val_samples, model, epoch_metrics)
-        # epoch_metrics_summaries(param.settings, epoch_metrics, epoch)
-        # epoch_metrics.print_metrics()
-        # # Save all
-        # param.save_to_json(save_dir)
-        # epoch_metrics.save_to_json(save_dir)
+            train_summaries(train_outputs, optimizer, param.settings, learning_rate)
+        for val_samples in tqdm(
+            val_dataset.dataset, desc="Validation", total=val_dataset.num_it_per_epoch
+        ):
+            val_step(val_samples, model, epoch_metrics)
+        epoch_metrics_summaries(param.settings, epoch_metrics, epoch)
+        epoch_metrics.print_metrics()
+        # Save all
+        param.save_to_json(save_dir)
+        epoch_metrics.save_to_json(save_dir)
         model.save(save_dir)
 
 

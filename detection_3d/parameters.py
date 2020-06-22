@@ -35,17 +35,17 @@ class Parameters(object):
             "train_summaries": "log/summaries/train",
             "eval_summaries": "log/summaries/val",
             # Update tensorboard train images each step_summaries iterations
-            "step_summaries": 100,  # to turn off make it None
+            "step_summaries": None,  # to turn off make it None
             # General settings
             "seed": 2020,
             "max_epochs": 1000,
             "weight_decay": 1e-4,
-            "learning_rate": 1e-5,
+            "learning_rate": 1e-3,
         }
 
         # Set special parameters
         self.settings["optimizer"] = "adam"
-        self.settings["scheduler"] = "no_scheduler"
+        self.settings["scheduler"] = "restarts"
 
         # Detection related
         self.settings["grid_meters"] = [52.0, 104.0, 8.0]  # [x,y,z ] in meters

@@ -54,10 +54,17 @@ def load_model(checkpoints_dir, model, resume):
     return start_epoch, model
 
 
-def get_optimizer(optimizer_name, lr):
+def get_optimizer(optimizer_name, scheduler_name, lr, num_iter_per_epoch):
+    if scheduler_name == "no_scheduler":
+        learning_rate = lr
+    elif scheduler_name == "restarts":
+        learning_rate = tf.keras.experimental.CosineDecayRestarts(
+            lr, 10 * num_iter_per_epoch, t_mul=2.0, m_mul=1.0, alpha=1e-6,
+        )
+
     if optimizer_name == "adam":
-        optimizer_type = tf.keras.optimizers.Adam(lr)
+        optimizer_type = tf.keras.optimizers.Adam(learning_rate)
     else:
         ValueError("Error: Unknow optimizer {}".format(optimizer_name))
 
-    return optimizer_type
+    return learning_rate, optimizer_type

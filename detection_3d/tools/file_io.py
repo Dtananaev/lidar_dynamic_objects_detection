@@ -16,10 +16,42 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import json
-import numpy as np
 from detection_3d.data_preprocessing.pandaset_tools.helpers import labels
+
+
+def load_and_resize_image(image_filename, resize=None, data_type=tf.float32):
+    """
+    Load png image to tensor and resize if necessary
+    Arguments:
+       image_filename: image file to load
+       resize: tensor [new_width, new_height] or None
+    Return:
+       img: tensor of the size [1, H, W, 3]
+    """
+
+    img = tf.io.read_file(image_filename)
+    img = tf.image.decode_png(img)
+    # Add batch dim
+    img = tf.expand_dims(img, axis=0)
+
+    if resize is not None:
+        img = tf.compat.v1.image.resize_nearest_neighbor(img, resize)
+
+    img = tf.cast(img, data_type)
+    return img
+
+
+def save_plot_to_image(file_to_save, figure):
+    """
+    Save matplotlib figure to image and close
+    """
+    plt.savefig(file_to_save)
+    plt.close(figure)
 
 
 def read_json(json_filename):

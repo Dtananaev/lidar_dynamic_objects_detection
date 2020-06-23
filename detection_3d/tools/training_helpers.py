@@ -19,6 +19,8 @@ DEALINGS IN THE SOFTWARE.
 import os
 import glob
 import tensorflow as tf
+import copy
+from detection_3d.tools.statics import NO_SCHEDULER, RESTARTS_SCHEDULER, ADAM
 
 
 def setup_gpu():
@@ -54,15 +56,15 @@ def load_model(checkpoints_dir, model, resume):
     return start_epoch, model
 
 
-def get_optimizer(optimizer_name, scheduler_name, lr, num_iter_per_epoch):
-    if scheduler_name == "no_scheduler":
-        learning_rate = lr
-    elif scheduler_name == "restarts":
-        learning_rate = tf.keras.experimental.CosineDecayRestarts(
-            lr, 10 * num_iter_per_epoch, t_mul=2.0, m_mul=1.0, alpha=1e-6,
-        )
+def get_optimizer(optimizer_name, scheduler, num_iter_per_epoch):
+    if scheduler["name"] == NO_SCHEDULER:
+        learning_rate = scheduler["initial_learning_rate"]
+    elif scheduler["name"] == RESTARTS_SCHEDULER:
+        tmp_scheduler = copy.deepcopy(scheduler)
+        tmp_scheduler["first_decay_steps"] = scheduler["first_decay_steps"] * num_iter_per_epoch
+        learning_rate = tf.keras.experimental.CosineDecayRestarts(**tmp_scheduler)
 
-    if optimizer_name == "adam":
+    if optimizer_name == ADAM:
         optimizer_type = tf.keras.optimizers.Adam(learning_rate)
     else:
         ValueError("Error: Unknow optimizer {}".format(optimizer_name))

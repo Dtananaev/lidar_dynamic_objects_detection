@@ -18,6 +18,7 @@ DEALINGS IN THE SOFTWARE.
 """
 import os
 from detection_3d.tools.file_io import save_to_json
+from detection_3d.tools.statics import NO_SCHEDULER, RESTARTS_SCHEDULER, ADAM
 
 
 class Parameters(object):
@@ -35,17 +36,16 @@ class Parameters(object):
             "train_summaries": "log/summaries/train",
             "eval_summaries": "log/summaries/val",
             # Update tensorboard train images each step_summaries iterations
-            "step_summaries": None,  # to turn off make it None
+            "step_summaries": 100,  # to turn off make it None
             # General settings
             "seed": 2020,
             "max_epochs": 1000,
             "weight_decay": 1e-4,
-            "learning_rate": 1e-3,
         }
 
         # Set special parameters
-        self.settings["optimizer"] = "adam"
-        self.settings["scheduler"] = "restarts"
+        self.settings["optimizer"] = ADAM
+        self.settings["scheduler"] = SchedulerSettings.restarts_scheduler()
 
         # Detection related
         self.settings["grid_meters"] = [52.0, 104.0, 8.0]  # [x,y,z ] in meters
@@ -69,3 +69,40 @@ class Parameters(object):
         os.makedirs(dir_to_save, exist_ok=True)
         json_filename = os.path.join(dir_to_save, "parameters.json")
         save_to_json(json_filename, self.settings)
+
+
+class SchedulerSettings:
+    """
+    The class contains parameters for different schedulers.
+    """
+
+    def __init__(self):
+        pass
+
+    # Supported schedulers
+    @staticmethod
+    def no_scheduler():
+        """
+        Constant learning rate scheduler.
+        """
+        scheduler = {
+            "name": NO_SCHEDULER,
+            "initial_learning_rate": 1e-4,
+        }
+        return scheduler
+
+    @staticmethod
+    def restarts_scheduler():
+        """
+        The warm restarts scheduler.
+        See: https://arxiv.org/abs/1608.03983
+        """
+        scheduler = {
+            "name": RESTARTS_SCHEDULER,
+            "initial_learning_rate": 2e-3,
+            "first_decay_steps": 10,  # Important: convertable param from epoch to iteration
+            "t_mul": 2.0,
+            "m_mul": 1.0,
+            "alpha": 1e-6,
+        }
+        return scheduler

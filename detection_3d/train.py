@@ -135,7 +135,6 @@ def train(resume=False):
     learning_rate, optimizer = get_optimizer(
         param.settings["optimizer"],
         param.settings["scheduler"],
-        param.settings["learning_rate"],
         train_dataset.num_it_per_epoch,
     )
     epoch_metrics = EpochMetrics()

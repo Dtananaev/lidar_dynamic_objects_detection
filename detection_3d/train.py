@@ -116,7 +116,12 @@ def train(resume=False):
     # Init label colors and label names
     tf.random.set_seed(param.settings["seed"])
 
-    train_dataset = DetectionDataset(param.settings, "train.datatxt", shuffle=True,)
+    train_dataset = DetectionDataset(
+        param.settings,
+        "train.datatxt",
+        augmentation=param.settings["augmentation"],
+        shuffle=True,
+    )
 
     param.settings["train_size"] = train_dataset.num_samples
     val_dataset = DetectionDataset(param.settings, "val.datatxt", shuffle=False)

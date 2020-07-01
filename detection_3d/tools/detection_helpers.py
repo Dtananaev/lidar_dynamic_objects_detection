@@ -150,14 +150,14 @@ def get_bboxes_grid(bbox_labels, lidar_corners_3d, grid_meters, bbox_voxel_size)
     return output_tensor
 
 
-def get_boxes_from_box_grid(box_grid, bbox_voxel_size, conf_trhld=0.9):
+def get_boxes_from_box_grid(box_grid, bbox_voxel_size, conf_trhld=0.0):
 
     # Get non-zero voxels
     objectness, delta_xy, orient_xy, z_coord, width, height, label = tf.split(
         box_grid, (1, 2, 2, 1, 1, 1, -1), axis=-1
     )
 
-    mask = box_grid[:, :, 0] >= conf_trhld
+    mask = box_grid[:, :, 0] > conf_trhld
     valid_idx = tf.where(mask)
 
     z_coord = tf.gather_nd(z_coord, valid_idx)

@@ -40,13 +40,13 @@ class Parameters(object):
             # General settings
             "seed": 2020,
             "max_epochs": 1000,
-            "weight_decay": 1e-4,
+            "weight_decay": 1,
         }
 
         # Set special parameters
         self.settings["optimizer"] = ADAM
-        self.settings["scheduler"] = SchedulerSettings.restarts_scheduler()
-
+        self.settings["scheduler"] = SchedulerSettings.no_scheduler()
+        self.settings["augmentation"] = True
         # Detection related
         self.settings["grid_meters"] = [52.0, 104.0, 8.0]  # [x,y,z ] in meters
         # [x,y,z, intensity] offset to shift all lidar points in positive coordinate quadrant
@@ -87,7 +87,7 @@ class SchedulerSettings:
         """
         scheduler = {
             "name": NO_SCHEDULER,
-            "initial_learning_rate": 1e-4,
+            "initial_learning_rate": 1e-5,
         }
         return scheduler
 
@@ -99,8 +99,8 @@ class SchedulerSettings:
         """
         scheduler = {
             "name": RESTARTS_SCHEDULER,
-            "initial_learning_rate": 2e-3,
-            "first_decay_steps": 10,  # Important: convertable param from epoch to iteration
+            "initial_learning_rate": 1e-4,  # 2e-3
+            "first_decay_steps": 80,  # Important: convertable param from epoch to iteration
             "t_mul": 2.0,
             "m_mul": 1.0,
             "alpha": 1e-6,

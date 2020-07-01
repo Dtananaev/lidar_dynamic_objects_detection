@@ -28,6 +28,11 @@ from detection_3d.tools.detection_helpers import (
     get_bboxes_grid,
 )
 from detection_3d.tools.visualization_tools import visualize_2d_boxes_on_top_image
+from detection_3d.tools.augmentation_tools import (
+    random_rotate_lidar_boxes,
+    random_flip_x_lidar_boxes,
+    random_flip_y_lidar_boxes,
+)
 from PIL import Image
 
 
@@ -40,9 +45,12 @@ class DetectionDataset:
         shuffle: shuffle the data True/False
     """
 
-    def __init__(self, param_settings, dataset_file, shuffle=False):
+    def __init__(self, param_settings, dataset_file, augmentation=False, shuffle=False):
         # Private methods
         self.seed = param_settings["seed"]
+        np.random.seed(self.seed)
+
+        self.augmentation = augmentation
 
         self.param_settings = param_settings
         self.dataset_file = dataset_file
@@ -80,6 +88,21 @@ class DetectionDataset:
         bboxes = load_bboxes(bboxes_file)
         labels = bboxes[:, -1]
         lidar_corners_3d, _ = make_eight_points_boxes(bboxes[:, :-1])
+        if self.augmentation:
+             np.random.shuffle(lidar)
+             if np.random.uniform(0, 1) < 0.50:  # 50% probability to flip over x axis
+                 lidar, lidar_corners_3d = random_flip_x_lidar_boxes(
+                     lidar, lidar_corners_3d
+                 )
+             if np.random.uniform(0, 1) < 0.50:  # 50% probability  to flip over y axis
+                 lidar, lidar_corners_3d = random_flip_y_lidar_boxes(
+                    lidar, lidar_corners_3d
+                 )
+             if np.random.uniform(0, 1) < 0.80:  # 80% probability to rotate
+                lidar, lidar_corners_3d = random_rotate_lidar_boxes(
+                    lidar, lidar_corners_3d
+                )
+
         # # Shift lidar coordinate to positive quadrant
         lidar_coord = np.asarray(self.param_settings["lidar_offset"], dtype=np.float32)
         lidar = lidar + lidar_coord

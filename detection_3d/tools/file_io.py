@@ -60,25 +60,43 @@ def read_json(json_filename):
         return data
 
 
-def save_bboxes_to_file(filename, centroid, width, length, height, alpha, label):
+def save_bboxes_to_file(
+    filename, centroid, width, length, height, alpha, label, delim=";"
+):
 
     if centroid is not None:
         with open(filename, "w") as the_file:
             for c, w, l, h, a, lbl in zip(
                 centroid, width, length, height, alpha, label
             ):
-                data = "{};{};{};{};{};{};{};{}\n".format(
-                    c[0], c[1], c[2], l, w, h, a, lbl
+                data = (
+                    delim.join(
+                        (
+                            str(c[0]),
+                            str(c[1]),
+                            str(c[2]),
+                            str(l),
+                            str(w),
+                            str(h),
+                            str(a),
+                            str(lbl),
+                        )
+                    )
+                    + "\n"
                 )
+                # data = "{};{};{};{};{};{};{};{}\n".format(
+                #     c[0], c[1], c[2], l, w, h, a, lbl
+                # )
                 the_file.write(data)
 
 
-def load_bboxes(label_filename):
+def load_bboxes(label_filename, label_string=True):
     # returns the array with [num_boxes, (bbox_parm)]
     with open(label_filename) as f:
         bboxes = np.asarray([line.rstrip().split(";") for line in f])
         # Convert labels to numbers
-        bboxes[:, -1] = [labels[label] for label in bboxes[:, -1]]
+        if label_string:
+            bboxes[:, -1] = [labels[label] for label in bboxes[:, -1]]
         bboxes = np.asarray(bboxes, dtype=float)
         return bboxes
 

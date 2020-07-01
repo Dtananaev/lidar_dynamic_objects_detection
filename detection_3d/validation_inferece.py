@@ -25,6 +25,12 @@ from detection_3d.parameters import Parameters
 from detection_3d.tools.training_helpers import setup_gpu
 from detection_3d.detection_dataset import DetectionDataset
 from detection_3d.tools.visualization_tools import visualize_2d_boxes_on_top_image
+from detection_3d.tools.file_io import save_bboxes_to_file
+from detection_3d.tools.detection_helpers import (
+    make_eight_points_boxes,
+    get_boxes_from_box_grid,
+    get_bboxes_parameters_from_points,
+)
 from PIL import Image
 from tqdm import tqdm
 import timeit
@@ -45,10 +51,7 @@ def validation_inference(param_settings, dataset_file, model_dir, output_dir):
         val_dataset.dataset, desc=f"val_inference", total=val_dataset.num_it_per_epoch,
     ):
         top_view, gt_boxes, lidar_filenames = val_samples
-        start = timeit.timeit()
         predictions = model(top_view, training=False)
-        end = timeit.timeit()
-        print(f"Time elapsed {end - start}")
         for image, predict, gt, filename in zip(
             top_view, predictions, gt_boxes, lidar_filenames
         ):
@@ -77,11 +80,29 @@ def validation_inference(param_settings, dataset_file, model_dir, output_dir):
             img = Image.fromarray(result.astype("uint8"))
             img.save(file_to_save)
 
+            box, labels, _ = get_boxes_from_box_grid(predict, bbox_voxel_size)
+            box = box.numpy()
+            box, _ = make_eight_points_boxes(box)
+            if len(box) > 0:
+                box = box - lidar_coord[:3]
+                labels = np.argmax(labels, axis=-1)
+                (
+                    centroid,
+                    width,
+                    length,
+                    height,
+                    yaw,
+                ) = get_bboxes_parameters_from_points(box)
+                bboxes_name = os.path.join(bboxes_dir, name + ".txt")
+                save_bboxes_to_file(
+                    bboxes_name, centroid, width, length, height, yaw, labels
+                )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Inference  validation set.")
     parser.add_argument(
-        "--dataset_file", default="train.datatxt",
+        "--dataset_file", default="val.datatxt",
     )
 
     parser.add_argument("--output_dir", default="inference")

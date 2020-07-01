@@ -40,7 +40,7 @@ def train_summaries(train_out, optimizer, param_settings, learning_rate):
         ) = train_out["losses"]
 
         # Show learning rate given scheduler
-        if param_settings["scheduler"] != "no_scheduler":
+        if param_settings["scheduler"]["name"] != "no_scheduler":
             with tf.name_scope("Optimizer info"):
                 step = float(
                     optimizer.iterations.numpy()

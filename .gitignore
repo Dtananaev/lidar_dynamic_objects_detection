@@ -5,6 +5,5 @@ dataset
 *-INFO
 log
 inference
-*.png
 *.bin
 

@@ -10,7 +10,7 @@ The network weights could be loaded [weight](https://drive.google.com/file/d/1m8
 ## The method
 
 The lidar point cloud represented as top view image where each pixel of the image corresponds to 12.5x12.5 cm. For each grid cell
-we project radom point and write height and intensity
+we project random point and get the height and intensity
 <p align="center">
   <img src="https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/topview.png" width="900"/>
 </p>

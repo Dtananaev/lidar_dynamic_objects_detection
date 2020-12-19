@@ -81,5 +81,5 @@ The dataset should have the next folder structure:
 Preprocess dataset by applying next command:
 ```
 cd lidar_dynamic_objects_detection/detection_3d/data_preprocessing/pandaset_tools
-python preprocess_data.py
+python preprocess_data.py --dataset_dir <path_to_your_dataset_dir>
 ```

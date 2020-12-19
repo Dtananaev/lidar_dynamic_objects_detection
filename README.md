@@ -33,10 +33,6 @@ pip install -e .
 ```
 This should install all the necessary packages to your environment.
 
-
-
-
-
 ## The method
 
 The lidar point cloud represented as top view image where each pixel of the image corresponds to 12.5x12.5 cm. For each grid cell
@@ -50,4 +46,33 @@ We are doing direct regression of the 3D boxes, thus for each pixel of the image
 </p>
 We apply binary cross entrophy for confidence loss, l1 loss for all box parameters regression and softmax loss for classes prediction.
 The confidence map computed from ground truth boxes. We assign the closest to the box centroid cell as confidence 1.0 (green on the image above)
-and 0 otherwise. We apply confidence loss for all the pixels. Other losses  applied only for those pixels where we have confidence ground truth 1.0. 
+and 0 otherwise. We apply confidence loss for all the pixels. Other losses  applied only for those pixels where we have confidence ground truth 1.0.
+
+## The dataset preparation
+We work with Pandaset dataset which can be uploaded from here: [Pandaset](https://pandaset.org/)
+Upload and unpack all the data to dataset folder (e.g. ~/dataset).
+The dataset should have the next folder structure:
+    dataset
+    ├── 001                     # The sequence number
+    │   ├── annotations         # Bounding boxes and semseg annotations
+    |   |   ├──cuboids
+    |   |   |  ├──00.pkl.gz
+    |   |   |  └──  ...
+    |   |   ├──semseg
+    |   |      ├──00.pkl.gz
+    |   |      └── ...
+    │   ├── camera             # cameras images
+    |   |  ├──back_camera
+    |   |  |  ├──00.jpg
+    |   |  |  └── ..
+    |   |  ├──front_camera
+    |   |  └── ...
+    │   ├── lidar             # lidar data
+    │   |    ├── 00.pkl.gz
+    │   |    └── ... 
+    |   ├── meta
+    |   |   ├── gps.json
+    |   |   ├── timestamps.json
+    ├── 002
+    └── ...
+

@@ -83,3 +83,24 @@ Preprocess dataset by applying next command:
 cd lidar_dynamic_objects_detection/detection_3d/data_preprocessing/pandaset_tools
 python preprocess_data.py --dataset_dir <path_to_your_dataset_dir>
 ```
+Create dataset lists:
+```
+cd lidar_dynamic_objects_detection/detection_3d/
+python create_dataset_lists.py --dataset_dir <path_to_your_dataset_dir>
+```
+This should create ```train.datatxt``` and ```val.datatxt``` into your dataset folder.
+Finally change into ```parameters.py``` the directory of the dataset.
+## Train
+In order to train the network:
+```
+python train.py
+```
+In order to resume training:
+```
+python train.py --resume
+```
+The training can be monitored in tensorboard:
+```
+tensorboard --logdir=log
+```
+

@@ -103,4 +103,8 @@ The training can be monitored in tensorboard:
 ```
 tensorboard --logdir=log
 ```
-
+## Inference on validation dataset
+In order to do inference on validation dataset:
+```
+python validation_inference.py --dataset_file <path_to_dataset_folder>/val.datatxt --output_dir <path_to_inference_output> --model_dir <path_to_trained_model>
+```

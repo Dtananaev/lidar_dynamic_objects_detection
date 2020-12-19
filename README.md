@@ -108,3 +108,4 @@ In order to do inference on validation dataset:
 ```
 python validation_inference.py --dataset_file <path_to_dataset_folder>/val.datatxt --output_dir <path_to_inference_output> --model_dir <path_to_trained_model>
 ```
+The result of the inference is 3d boxes and also visualized 3d boxes on top view image. The visualized top view image (upper) concatenated with ground truth top view image (bottom).

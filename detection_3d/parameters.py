@@ -27,6 +27,7 @@ class Parameters(object):
     """
 
     def __init__(self):
+
         self.settings = {
             # The directory of the dataset
             "dataset_dir": "dataset",

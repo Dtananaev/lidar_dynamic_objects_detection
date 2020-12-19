@@ -61,7 +61,9 @@ def get_optimizer(optimizer_name, scheduler, num_iter_per_epoch):
         learning_rate = scheduler["initial_learning_rate"]
     elif scheduler["name"] == RESTARTS_SCHEDULER:
         tmp_scheduler = copy.deepcopy(scheduler)
-        tmp_scheduler["first_decay_steps"] = scheduler["first_decay_steps"] * num_iter_per_epoch
+        tmp_scheduler["first_decay_steps"] = (
+            scheduler["first_decay_steps"] * num_iter_per_epoch
+        )
         learning_rate = tf.keras.experimental.CosineDecayRestarts(**tmp_scheduler)
 
     if optimizer_name == ADAM:

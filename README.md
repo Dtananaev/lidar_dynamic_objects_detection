@@ -47,19 +47,13 @@ We are doing direct regression of the 3D boxes, thus for each pixel of the image
 We apply binary cross entrophy for confidence loss, l1 loss for all box parameters regression and softmax loss for classes prediction.
 The confidence map computed from ground truth boxes. We assign the closest to the box centroid cell as confidence 1.0 (green on the image above)
 and 0 otherwise. We apply confidence loss for all the pixels. Other losses  applied only for those pixels where we have confidence ground truth 1.0.
-    .
-    ├── build                   # Compiled files (alternatively `dist`)
-    ├── docs                    # Documentation files (alternatively `doc`)
-    ├── src                     # Source files (alternatively `lib` or `app`)
-    ├── test                    # Automated tests (alternatively `spec` or `tests`)
-    ├── tools                   # Tools and utilities
-    ├── LICENSE
-    └── README.md
+
 
 ## The dataset preparation
 We work with Pandaset dataset which can be uploaded from here: [Pandaset](https://pandaset.org/)
 Upload and unpack all the data to dataset folder (e.g. ~/dataset).
 The dataset should have the next folder structure:
+``` bash
     dataset
     ├── 001                     # The sequence number
     │   ├── annotations         # Bounding boxes and semseg annotations
@@ -83,4 +77,4 @@ The dataset should have the next folder structure:
     |   |   ├── timestamps.json
     ├── 002
     └── ...
-
+```

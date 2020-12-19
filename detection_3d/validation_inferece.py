@@ -108,8 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", default="inference")
 
     parser.add_argument(
-        "--model_dir",
-        default="/home/denis/lidar_dynamic_objects_detection/detection_3d/log/checkpoints/YoloV3_Lidar-0085",
+        "--model_dir", default="YoloV3_Lidar-0085",
     )
     args = parser.parse_args()
 

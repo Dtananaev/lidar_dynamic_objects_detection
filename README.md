@@ -2,10 +2,41 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/LICENSE.md) 
 
-The method
+## The result of network (click on the image below)
+
+[![result](https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/result.png)](https://youtu.be/f_HZg9Cq-h4)
+The network weights could be loaded [weight](https://drive.google.com/file/d/1m8N5m2WXATgFNw88BRqEbUieiyV7p3S0/view?usp=sharing).
+## Installation
+For ubuntu 18.04 install necessary dependecies:
+```
+sudo apt update
+sudo apt install python3-dev python3-pip python3-venv
+```
+Create virtual environment and activate it:
+```
+python3 -m venv --system-site-packages ./venv
+source ./venv/bin/activate
+```
+Upgrade pip tools:
+```
+pip install --upgrade pip
+```
+Install tensorflow 2.0  (for more details check the tensofrolow install tutorial: [tensorflow](https://www.tensorflow.org/install/pip))
+```
+pip install --upgrade tensorflow-gpu
+```
+Clone this repository and then install it:
+```
+cd lidar_dynamic_objects_detection
+pip install -r requirements.txt
+pip install -e .
+```
+This should install all the necessary packages to your environment.
+
+## The method
 
 The lidar point cloud represented as top view image where each pixel of the image corresponds to 12.5x12.5 cm. For each grid cell
-we project radom point and write height and intensity
+we project random point and get the height and intensity
 <p align="center">
   <img src="https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/topview.png" width="900"/>
 </p>
@@ -13,11 +44,68 @@ We are doing direct regression of the 3D boxes, thus for each pixel of the image
 <p align="center">
   <img src="https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/box_parametrization.png" width="1500"/>
 </p>
-We apply binary cross entrophy for confidence loss, l1 loss for all box parameters regression and softmax loss for classes regression.
+We apply binary cross entrophy for confidence loss, l1 loss for all box parameters regression and softmax loss for classes prediction.
 The confidence map computed from ground truth boxes. We assign the closest to the box centroid cell as confidence 1.0 (green on the image above)
-and 0 otherwise. We apply confidence loss for all the pixels. Other losses  applied only for those pixels where we have confidence ground truth 1.0. 
+and 0 otherwise. We apply confidence loss for all the pixels. Other losses  applied only for those pixels where we have confidence ground truth 1.0.
 
-The result of network (click on the image below)
-[![result](https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/result.png)](https://youtu.be/f_HZg9Cq-h4)
-The network weights could be loaded [weight](https://drive.google.com/file/d/1m8N5m2WXATgFNw88BRqEbUieiyV7p3S0/view?usp=sharing).
 
+## The dataset preparation
+We work with Pandaset dataset which can be uploaded from here: [Pandaset](https://pandaset.org/)
+Upload and unpack all the data to dataset folder (e.g. ~/dataset).
+The dataset should have the next folder structure:
+``` bash
+    dataset
+    ├── 001                     # The sequence number
+    │   ├── annotations         # Bounding boxes and semseg annotations
+    |   |   ├──cuboids
+    |   |   |  ├──00.pkl.gz
+    |   |   |  └──  ...
+    |   |   ├──semseg
+    |   |      ├──00.pkl.gz
+    |   |      └── ...
+    │   ├── camera             # cameras images
+    |   |  ├──back_camera
+    |   |  |  ├──00.jpg
+    |   |  |  └── ..
+    |   |  ├──front_camera
+    |   |  └── ...
+    │   ├── lidar             # lidar data
+    │   |    ├── 00.pkl.gz
+    │   |    └── ... 
+    |   ├── meta
+    |   |   ├── gps.json
+    |   |   ├── timestamps.json
+    ├── 002
+    └── ...
+```
+Preprocess dataset by applying next command:
+```
+cd lidar_dynamic_objects_detection/detection_3d/data_preprocessing/pandaset_tools
+python preprocess_data.py --dataset_dir <path_to_your_dataset_dir>
+```
+Create dataset lists:
+```
+cd lidar_dynamic_objects_detection/detection_3d/
+python create_dataset_lists.py --dataset_dir <path_to_your_dataset_dir>
+```
+This should create ```train.datatxt``` and ```val.datatxt``` into your dataset folder.
+Finally change into ```parameters.py``` the directory of the dataset.
+## Train
+In order to train the network:
+```
+python train.py
+```
+In order to resume training:
+```
+python train.py --resume
+```
+The training can be monitored in tensorboard:
+```
+tensorboard --logdir=log
+```
+## Inference on validation dataset
+In order to do inference on validation dataset:
+```
+python validation_inference.py --dataset_file <path_to_dataset_folder>/val.datatxt --output_dir <path_to_inference_output> --model_dir <path_to_trained_model>
+```
+The result of the inference is 3d boxes and also visualized 3d boxes on top view image. The visualized top view image (upper) concatenated with ground truth top view image (bottom).

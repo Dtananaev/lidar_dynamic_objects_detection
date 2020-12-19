@@ -28,7 +28,7 @@ class Parameters(object):
 
     def __init__(self):
         self.settings = {
-            # The directory for checkpoints
+            # The directory of the dataset
             "dataset_dir": "dataset",
             "batch_size": 4,
             # The checkpoint related

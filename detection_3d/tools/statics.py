@@ -20,5 +20,4 @@ DEALINGS IN THE SOFTWARE.
 NO_SCHEDULER = "no_scheduler"
 RESTARTS_SCHEDULER = "restarts"
 
-
 ADAM = "adam"

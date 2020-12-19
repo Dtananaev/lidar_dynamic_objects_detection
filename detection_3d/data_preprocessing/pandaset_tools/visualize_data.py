@@ -46,7 +46,12 @@ def preprocess_data(dataset_dir):
     Arguments:
         dataset_dir: directory with  Pandaset data
     """
-    shift_lidar = [25, 50, 2.5]
+    shift_lidar = [
+        25,
+        50,
+        2.5,
+    ]  # The lidar coordinates is in the middle of point cloud we shift them to left top corner of the top view image
+    # the top view image applied to the area of 50x100 meters around the car, where the most dense lidar point cloud
     # Get list of data samples
     search_string = os.path.join(dataset_dir, "*")
     seq_list = sorted(glob.glob(search_string))

@@ -19,7 +19,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 import tensorflow as tf
-from perception.tools.io_file import save_to_json
+from detection_3d.tools.file_io import save_to_json
 import numpy as np
 import os
 

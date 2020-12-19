@@ -42,7 +42,7 @@ from detection_3d.tools.visualization_tools import visualize_lidar, visualize_bb
 
 def preprocess_data(dataset_dir):
     """
-    The function visualizes data from pandaset.
+    The function prepares data for training from pandaset.
     Arguments:
         dataset_dir: directory with  Pandaset data
     """

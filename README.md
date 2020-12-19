@@ -21,10 +21,17 @@ Upgrade pip tools:
 ```
 pip install --upgrade pip
 ```
-Install tensorflow 2.0  (for more details check the tensofrolow install tutorial:[tensorflow](https://www.tensorflow.org/install/pip))
+Install tensorflow 2.0  (for more details check the tensofrolow install tutorial: [tensorflow](https://www.tensorflow.org/install/pip))
 ```
 pip install --upgrade tensorflow-gpu
 ```
+Clone this repository and then install it:
+```
+cd lidar_dynamic_objects_detection
+pip install -r requirements.txt
+pip install -e .
+```
+This should install all the necessary packages to your environment.
 
 
 

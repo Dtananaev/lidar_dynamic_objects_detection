@@ -6,6 +6,29 @@
 
 [![result](https://github.com/Dtananaev/lidar_dynamic_objects_detection/blob/master/pictures/result.png)](https://youtu.be/f_HZg9Cq-h4)
 The network weights could be loaded [weight](https://drive.google.com/file/d/1m8N5m2WXATgFNw88BRqEbUieiyV7p3S0/view?usp=sharing).
+## Installation
+For ubuntu 18.04 install necessary dependecies:
+```
+sudo apt update
+sudo apt install python3-dev python3-pip python3-venv
+```
+Create virtual environment and activate it:
+```
+python3 -m venv --system-site-packages ./venv
+source ./venv/bin/activate
+```
+Upgrade pip tools:
+```
+pip install --upgrade pip
+```
+Install tensorflow 2.0  (for more details check the tensofrolow install tutorial:[tensorflow](https://www.tensorflow.org/install/pip))
+```
+pip install --upgrade tensorflow-gpu
+```
+
+
+
+
 
 ## The method
 
